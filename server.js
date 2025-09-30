@@ -10,10 +10,11 @@ const io = require('socket.io')(http, {
 
 const PORT = process.env.PORT || 3000;
 
-// تخزين الغرف والمستخدمين
+// تخزين الغرف
 const rooms = new Map();
 
-app.use(express.static('public'));
+// تقديم الملفات الثابتة
+app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
@@ -22,58 +23,130 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('مستخدم جديد متصل:', socket.id);
 
-    socket.on('join-room', (data) => {
-        const { roomId, mode } = data;
+    // إنشاء غرفة جديدة (للمرسل)
+    socket.on('create-room', (data) => {
+        const { code } = data;
         
-        socket.join(roomId);
-        
-        if (!rooms.has(roomId)) {
-            rooms.set(roomId, new Set());
+        // إنشاء الغرفة
+        if (!rooms.has(code)) {
+            rooms.set(code, {
+                sender: socket.id,
+                receivers: new Set(),
+                createdAt: Date.now()
+            });
+            
+            socket.join(code);
+            socket.roomCode = code;
+            socket.role = 'sender';
+            
+            socket.emit('room-created', { 
+                code: code,
+                message: 'تم إنشاء الغرفة بنجاح' 
+            });
+            
+            console.log(`غرفة جديدة: ${code} - المرسل: ${socket.id}`);
         }
-        
-        rooms.get(roomId).add({
-            id: socket.id,
-            mode: mode
-        });
-        
-        console.log(`المستخدم ${socket.id} انضم للغرفة ${roomId} في وضع ${mode}`);
-        
-        socket.emit('room-joined', { roomId, userCount: rooms.get(roomId).size });
-        io.to(roomId).emit('user-connected', { userId: socket.id, mode });
     });
 
+    // الانضمام لغرفة (للمستقبل)
+    socket.on('join-room', (data) => {
+        const { code } = data;
+        
+        if (rooms.has(code)) {
+            const room = rooms.get(code);
+            room.receivers.add(socket.id);
+            
+            socket.join(code);
+            socket.roomCode = code;
+            socket.role = 'receiver';
+            
+            const deviceCount = room.receivers.size + 1; // +1 للمرسل
+            
+            // إخبار المستقبل
+            socket.emit('joined-room', { 
+                code: code,
+                deviceCount: deviceCount,
+                message: 'تم الانضمام للغرفة بنجاح'
+            });
+            
+            // إخبار جميع الأجهزة في الغرفة
+            io.to(code).emit('device-joined', {
+                deviceId: socket.id,
+                deviceCount: deviceCount,
+                message: 'انضم جهاز جديد'
+            });
+            
+            console.log(`انضم ${socket.id} للغرفة ${code} - عدد الأجهزة: ${deviceCount}`);
+        } else {
+            socket.emit('room-not-found', {
+                message: 'كود الغرفة غير صحيح'
+            });
+        }
+    });
+
+    // إرسال صورة
     socket.on('send-image', (data) => {
-        const { roomId, image } = data;
+        const { code, image } = data;
         
-        // إرسال الصورة لجميع المستخدمين في الغرفة عدا المرسل
-        socket.to(roomId).emit('image-received', {
-            image: image,
-            senderId: socket.id,
-            timestamp: new Date().toISOString()
-        });
-        
-        console.log(`صورة مرسلة من ${socket.id} إلى الغرفة ${roomId}`);
+        if (rooms.has(code)) {
+            // إرسال الصورة لجميع المستقبلين
+            socket.to(code).emit('image-received', {
+                image: image,
+                senderId: socket.id,
+                timestamp: Date.now()
+            });
+            
+            console.log(`صورة مرسلة من ${socket.id} في الغرفة ${code}`);
+        }
     });
 
+    // قطع الاتصال
     socket.on('disconnect', () => {
         console.log('مستخدم غادر:', socket.id);
         
-        // إزالة المستخدم من جميع الغرف
-        rooms.forEach((users, roomId) => {
-            users.forEach(user => {
-                if (user.id === socket.id) {
-                    users.delete(user);
-                    io.to(roomId).emit('user-disconnected', { userId: socket.id });
-                }
-            });
+        if (socket.roomCode) {
+            const room = rooms.get(socket.roomCode);
             
-            if (users.size === 0) {
-                rooms.delete(roomId);
+            if (room) {
+                if (socket.role === 'sender') {
+                    // إذا غادر المرسل، حذف الغرفة
+                    io.to(socket.roomCode).emit('sender-disconnected', {
+                        message: 'غادر المرسل - تم إنهاء الجلسة'
+                    });
+                    rooms.delete(socket.roomCode);
+                } else {
+                    // إذا غادر مستقبل
+                    room.receivers.delete(socket.id);
+                    const deviceCount = room.receivers.size + 1;
+                    
+                    io.to(socket.roomCode).emit('device-disconnected', {
+                        deviceId: socket.id,
+                        deviceCount: deviceCount,
+                        message: 'غادر أحد الأجهزة'
+                    });
+                }
             }
-        });
+        }
     });
 });
 
+// تنظيف الغرف القديمة كل 5 دقائق
+setInterval(() => {
+    const now = Date.now();
+    const timeout = 30 * 60 * 1000; // 30 دقيقة
+    
+    rooms.forEach((room, code) => {
+        if (now - room.createdAt > timeout) {
+            io.to(code).emit('session-expired', {
+                message: 'انتهت صلاحية الجلسة'
+            });
+            rooms.delete(code);
+            console.log(`حذف الغرفة المنتهية: ${code}`);
+        }
+    });
+}, 5 * 60 * 1000);
+
 http.listen(PORT, () => {
-    console.log(`الخادم يعمل على المنفذ ${PORT}`);
+    console.log(`🚀 الخادم يعمل على http://localhost:${PORT}`);
+    console.log('📱 افتح هذا الرابط على الأجهزة المختلفة');
 });
