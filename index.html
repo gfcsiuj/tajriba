@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نقل الصور بإشارة اليد</title>
+    <title>نقل الصور بإشارة اليد - WebRTC</title>
     <style>
         * {
             margin: 0;
@@ -35,6 +35,11 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
         .main-panel {
             background: white;
             border-radius: 20px;
@@ -42,7 +47,6 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        /* قسم اختيار الوضع */
         .mode-selector {
             display: flex;
             gap: 20px;
@@ -84,7 +88,6 @@
             border-color: #2196f3;
         }
 
-        /* قسم الاتصال */
         .connection-section {
             display: none;
             padding: 25px;
@@ -109,42 +112,32 @@
             }
         }
 
-        .send-connection {
-            text-align: center;
-        }
-
         .code-display {
             background: white;
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
+            text-align: center;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .code-label {
-            font-size: 1.1em;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
         .code-value {
-            font-size: 2.5em;
+            font-size: 2em;
             font-weight: bold;
             color: #667eea;
             font-family: 'Courier New', monospace;
-            letter-spacing: 8px;
+            letter-spacing: 5px;
             padding: 15px;
             background: #f0f0f0;
             border-radius: 10px;
             margin: 10px 0;
             user-select: all;
             cursor: pointer;
-            transition: all 0.3s ease;
+            word-break: break-all;
         }
 
         .code-value:hover {
             background: #e0e0e0;
-            transform: scale(1.02);
         }
 
         .copy-btn-large {
@@ -164,31 +157,27 @@
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
-        .receive-connection {
-            text-align: center;
-        }
-
         .code-input-group {
             display: flex;
+            flex-direction: column;
             gap: 15px;
             align-items: center;
-            justify-content: center;
             margin: 20px 0;
         }
 
-        .code-input {
-            padding: 15px 25px;
-            font-size: 1.5em;
-            text-align: center;
+        .code-input-area {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            font-size: 1.1em;
             border: 3px solid #e0e0e0;
             border-radius: 10px;
-            width: 300px;
             font-family: 'Courier New', monospace;
-            letter-spacing: 5px;
-            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 100px;
         }
 
-        .code-input:focus {
+        .code-input-area:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -210,13 +199,6 @@
             box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
         }
 
-        .connect-btn-large:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* حالة الاتصال */
         .connection-status-box {
             display: none;
             padding: 20px;
@@ -224,7 +206,6 @@
             margin: 20px 0;
             text-align: center;
             font-size: 1.2em;
-            animation: pulse 2s infinite;
         }
 
         .connection-status-box.show {
@@ -249,16 +230,6 @@
             border: 2px solid #dc3545;
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-
-        /* منطقة المحتوى */
         .content-area {
             display: none;
             grid-template-columns: 1fr 1fr;
@@ -278,27 +249,12 @@
             .mode-selector {
                 flex-direction: column;
             }
-            
-            .code-input-group {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .code-input {
-                width: 100%;
-            }
         }
 
         .video-section, .image-section {
             background: #f8f9fa;
             border-radius: 15px;
             padding: 20px;
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            color: #333;
-            margin-bottom: 15px;
         }
 
         .video-container {
@@ -363,7 +319,6 @@
             display: none;
         }
 
-        /* الإشعارات */
         .notification {
             position: fixed;
             top: 30px;
@@ -406,21 +361,43 @@
             }
         }
 
-        /* عداد الأجهزة المتصلة */
-        .devices-counter {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-right: 4px solid #2196f3;
         }
 
-        .devices-counter .count {
-            color: #4caf50;
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-right: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+        }
+
+        .send-btn-manual {
+            width: 100%;
+            padding: 15px;
             font-size: 1.2em;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .send-btn-manual:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(238, 90, 36, 0.4);
         }
     </style>
 </head>
@@ -428,7 +405,7 @@
     <div class="container">
         <div class="header">
             <h1>✋ نقل الصور بإشارة اليد 📸</h1>
-            <p>انقل الصور بين الأجهزة بحركة يدك</p>
+            <p>انقل الصور بين الأجهزة مباشرة بدون خادم</p>
         </div>
 
         <div class="main-panel">
@@ -448,45 +425,81 @@
 
             <!-- قسم الاتصال للإرسال -->
             <div class="connection-section send-connection" id="sendConnection">
-                <h2>🔗 كود الاتصال</h2>
+                <h2 style="text-align: center;">🔗 كود الاتصال</h2>
+                
+                <div class="instructions">
+                    <h3>📋 التعليمات:</h3>
+                    <ol>
+                        <li>انسخ الكود الذي سيظهر أدناه</li>
+                        <li>أرسله للجهاز المستقبل</li>
+                        <li>انتظر حتى يتصل الجهاز الآخر</li>
+                    </ol>
+                </div>
+
                 <div class="code-display">
-                    <div class="code-label">شارك هذا الكود مع الجهاز المستقبل:</div>
-                    <div class="code-value" id="sessionCode" onclick="copyCode()">------</div>
-                    <button class="copy-btn-large" onclick="copyCode()">
+                    <div style="color: #666; margin-bottom: 10px;">انسخ هذا الكود وأرسله للجهاز المستقبل:</div>
+                    <div class="code-value" id="offerCode" onclick="copyOffer()">
+                        جاري إنشاء الكود...
+                    </div>
+                    <button class="copy-btn-large" onclick="copyOffer()">
                         📋 نسخ الكود
                     </button>
                 </div>
-                <div class="connection-status-box waiting" id="senderStatus">
-                    ⏳ في انتظار اتصال الجهاز المستقبل...
+
+                <div class="code-input-group">
+                    <label style="font-weight: bold;">الصق كود الرد من الجهاز المستقبل:</label>
+                    <textarea class="code-input-area" 
+                             id="answerInput" 
+                             placeholder="الصق كود الرد هنا..."></textarea>
+                    <button class="connect-btn-large" onclick="connectWithAnswer()">
+                        🔗 إتمام الاتصال
+                    </button>
                 </div>
+
+                <div class="connection-status-box" id="senderStatus"></div>
             </div>
 
             <!-- قسم الاتصال للاستقبال -->
             <div class="connection-section receive-connection" id="receiveConnection">
-                <h2>🔗 الاتصال بالمرسل</h2>
+                <h2 style="text-align: center;">🔗 الاتصال بالمرسل</h2>
+                
+                <div class="instructions">
+                    <h3>📋 التعليمات:</h3>
+                    <ol>
+                        <li>الصق كود المرسل في المربع الأول</li>
+                        <li>اضغط "إنشاء كود الرد"</li>
+                        <li>انسخ كود الرد وأرسله للمرسل</li>
+                    </ol>
+                </div>
+
                 <div class="code-input-group">
-                    <input type="text" 
-                           class="code-input" 
-                           id="receiverCodeInput" 
-                           placeholder="أدخل الكود"
-                           maxlength="6">
-                    <button class="connect-btn-large" onclick="connectToSender()">
-                        🔗 اتصال
+                    <label style="font-weight: bold;">الصق كود المرسل:</label>
+                    <textarea class="code-input-area" 
+                             id="offerInput" 
+                             placeholder="الصق كود المرسل هنا..."></textarea>
+                    <button class="connect-btn-large" onclick="createAnswer()">
+                        🔄 إنشاء كود الرد
                     </button>
                 </div>
+
+                <div class="code-display" id="answerDisplay" style="display: none;">
+                    <div style="color: #666; margin-bottom: 10px;">انسخ كود الرد وأرسله للمرسل:</div>
+                    <div class="code-value" id="answerCode" onclick="copyAnswer()">
+                        ...
+                    </div>
+                    <button class="copy-btn-large" onclick="copyAnswer()">
+                        📋 نسخ كود الرد
+                    </button>
+                </div>
+
                 <div class="connection-status-box" id="receiverStatus"></div>
             </div>
 
-            <!-- منطقة المحتوى الرئيسية -->
+            <!-- منطقة المحتوى -->
             <div class="content-area" id="contentArea">
-                <!-- عداد الأجهزة -->
-                <div class="devices-counter">
-                    👥 الأجهزة المتصلة: <span class="count" id="devicesCount">0</span>
-                </div>
-
                 <!-- قسم الكاميرا -->
                 <div class="video-section">
-                    <h3 class="section-title">📹 كاميرا التعرف على اليد</h3>
+                    <h3>📹 كاميرا التعرف على اليد</h3>
                     <div class="video-container">
                         <video id="video" autoplay playsinline style="display: none;"></video>
                         <canvas id="canvas"></canvas>
@@ -498,16 +511,19 @@
 
                 <!-- قسم الصورة -->
                 <div class="image-section">
-                    <h3 class="section-title" id="imageSectionTitle">🖼️ منطقة الصورة</h3>
+                    <h3 id="imageSectionTitle">🖼️ منطقة الصورة</h3>
                     <div class="image-preview">
                         <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                             <div style="font-size: 3em;">📁</div>
                             <p>اضغط لتحميل صورة</p>
-                            <p style="font-size: 0.9em; opacity: 0.7;">أو اسحب الصورة هنا</p>
                         </div>
                         <img id="displayImage" style="display: none; width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+                    
+                    <button class="send-btn-manual" id="manualSendBtn" style="display: none;" onclick="sendImage()">
+                        📤 إرسال الصورة يدوياً
+                    </button>
                 </div>
             </div>
         </div>
@@ -516,27 +532,31 @@
     <!-- الإشعارات -->
     <div class="notification" id="notification"></div>
 
-    <!-- المكتبات -->
+    <!-- MediaPipe -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
 
     <script>
         // المتغيرات الأساسية
         let currentMode = null;
-        let socket = null;
-        let sessionCode = null;
+        let pc = null;
+        let dataChannel = null;
         let isConnected = false;
         let currentImage = null;
         let lastHandState = null;
         let gestureSequence = [];
-        let connectedDevices = 0;
 
-        // توليد كود جلسة عشوائي
-        function generateSessionCode() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
+        // إعدادات STUN servers (مجانية من Google)
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ]
+        };
 
         // تحديد الوضع
         function setMode(mode) {
@@ -547,7 +567,7 @@
                 btn.classList.remove('active');
             });
             
-            // إخفاء جميع الأقسام
+            // إخفاء الأقسام
             document.querySelectorAll('.connection-section').forEach(section => {
                 section.classList.remove('show');
             });
@@ -558,15 +578,12 @@
                 document.getElementById('sendConnection').classList.add('show');
                 document.getElementById('uploadArea').style.display = 'block';
                 document.getElementById('imageSectionTitle').textContent = '📤 الصورة المراد إرسالها';
+                document.getElementById('manualSendBtn').style.display = 'block';
                 
-                // توليد كود جديد
-                sessionCode = generateSessionCode();
-                document.getElementById('sessionCode').textContent = sessionCode;
+                // إنشاء الاتصال
+                createOffer();
                 
-                // الاتصال بالخادم
-                connectToServer('sender');
-                
-                showNotification('تم توليد كود الجلسة: ' + sessionCode, 'info');
+                showNotification('تم تفعيل وضع الإرسال', 'info');
                 
             } else if (mode === 'receive') {
                 // وضع الاستقبال
@@ -574,155 +591,178 @@
                 document.getElementById('receiveConnection').classList.add('show');
                 document.getElementById('uploadArea').style.display = 'none';
                 document.getElementById('imageSectionTitle').textContent = '📥 الصورة المستلمة';
+                document.getElementById('manualSendBtn').style.display = 'none';
                 
-                showNotification('أدخل كود الجلسة للاتصال', 'info');
+                showNotification('تم تفعيل وضع الاستقبال', 'info');
             }
         }
 
-        // الاتصال بالخادم
-        function connectToServer(role) {
-            // الاتصال بالخادم المحلي
-            socket = io();
+        // إنشاء Offer (للمرسل)
+        async function createOffer() {
+            pc = new RTCPeerConnection(configuration);
             
-            socket.on('connect', () => {
-                console.log('متصل بالخادم');
-                
-                if (role === 'sender') {
-                    // إنشاء غرفة جديدة
-                    socket.emit('create-room', { code: sessionCode });
+            // إنشاء قناة البيانات
+            dataChannel = pc.createDataChannel('imageTransfer');
+            setupDataChannel();
+            
+            // معالجة ICE candidates
+            pc.onicecandidate = (event) => {
+                if (!event.candidate) {
+                    // جميع المرشحين جاهزون
+                    const offerString = btoa(JSON.stringify(pc.localDescription));
+                    document.getElementById('offerCode').textContent = offerString;
                 }
-            });
+            };
             
-            // استقبال تأكيد إنشاء الغرفة
-            socket.on('room-created', (data) => {
-                console.log('تم إنشاء الغرفة:', data.code);
-                document.getElementById('senderStatus').innerHTML = 
-                    '⏳ في انتظار اتصال الجهاز المستقبل...<br>كود الجلسة: ' + data.code;
-            });
+            // إنشاء العرض
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
             
-            // عندما ينضم جهاز للغرفة
-            socket.on('device-joined', (data) => {
-                isConnected = true;
-                connectedDevices = data.deviceCount;
-                updateConnectionStatus();
-                showNotification('✅ تم اتصال جهاز جديد!', 'success');
-                
-                // عرض منطقة المحتوى
-                document.getElementById('contentArea').classList.add('show');
-                document.getElementById('devicesCount').textContent = connectedDevices;
-                
-                if (currentMode === 'send') {
-                    document.getElementById('senderStatus').className = 'connection-status-box connected show';
-                    document.getElementById('senderStatus').innerHTML = 
-                        '✅ متصل بنجاح! يمكنك الآن إرسال الصور';
-                }
-            });
-            
-            // استقبال صورة
-            socket.on('image-received', (data) => {
-                if (currentMode === 'receive') {
-                    displayReceivedImage(data.image);
-                    showNotification('📸 تم استلام صورة جديدة!', 'success');
-                }
-            });
-            
-            // عند انقطاع الاتصال
-            socket.on('device-disconnected', (data) => {
-                connectedDevices = data.deviceCount;
-                document.getElementById('devicesCount').textContent = connectedDevices;
-                showNotification('⚠️ انقطع اتصال أحد الأجهزة', 'error');
-                
-                if (connectedDevices === 0) {
-                    isConnected = false;
-                    updateConnectionStatus();
-                }
-            });
-            
-            socket.on('disconnect', () => {
-                isConnected = false;
-                showNotification('❌ انقطع الاتصال بالخادم', 'error');
-            });
-            
-            // خطأ في الاتصال
-            socket.on('error', (error) => {
-                showNotification('❌ خطأ: ' + error, 'error');
-            });
+            document.getElementById('senderStatus').className = 'connection-status-box waiting show';
+            document.getElementById('senderStatus').innerHTML = '⏳ في انتظار كود الرد من الجهاز المستقبل...';
         }
 
-        // الاتصال بالمرسل (للمستقبل)
-        function connectToSender() {
-            const code = document.getElementById('receiverCodeInput').value.toUpperCase().trim();
+        // إنشاء Answer (للمستقبل)
+        async function createAnswer() {
+            const offerString = document.getElementById('offerInput').value.trim();
             
-            if (!code) {
-                showNotification('⚠️ الرجاء إدخال كود الجلسة', 'error');
+            if (!offerString) {
+                showNotification('⚠️ الرجاء إدخال كود المرسل', 'error');
                 return;
             }
             
-            sessionCode = code;
-            
-            // الاتصال بالخادم
-            socket = io();
-            
-            socket.on('connect', () => {
-                // الانضمام للغرفة
-                socket.emit('join-room', { code: sessionCode });
+            try {
+                const offer = JSON.parse(atob(offerString));
                 
-                document.getElementById('receiverStatus').classList.add('show', 'waiting');
-                document.getElementById('receiverStatus').innerHTML = '⏳ جاري الاتصال...';
-            });
-            
-            // تأكيد الانضمام
-            socket.on('joined-room', (data) => {
-                isConnected = true;
-                connectedDevices = data.deviceCount;
+                pc = new RTCPeerConnection(configuration);
                 
-                document.getElementById('receiverStatus').className = 'connection-status-box connected show';
-                document.getElementById('receiverStatus').innerHTML = 
-                    '✅ متصل بنجاح! في انتظار الصور...';
+                // معالجة قناة البيانات
+                pc.ondatachannel = (event) => {
+                    dataChannel = event.channel;
+                    setupDataChannel();
+                };
                 
-                document.getElementById('contentArea').classList.add('show');
-                document.getElementById('devicesCount').textContent = connectedDevices;
+                // معالجة ICE candidates
+                pc.onicecandidate = (event) => {
+                    if (!event.candidate) {
+                        // جميع المرشحين جاهزون
+                        const answerString = btoa(JSON.stringify(pc.localDescription));
+                        document.getElementById('answerCode').textContent = answerString;
+                        document.getElementById('answerDisplay').style.display = 'block';
+                    }
+                };
                 
-                showNotification('✅ تم الاتصال بنجاح!', 'success');
-            });
-            
-            // خطأ في الكود
-            socket.on('room-not-found', () => {
-                document.getElementById('receiverStatus').className = 'connection-status-box error show';
-                document.getElementById('receiverStatus').innerHTML = 
-                    '❌ كود الجلسة غير صحيح أو منتهي الصلاحية';
-                showNotification('❌ كود الجلسة غير صحيح', 'error');
-            });
-            
-            // نفس معالجات الأحداث السابقة
-            socket.on('device-joined', (data) => {
-                connectedDevices = data.deviceCount;
-                document.getElementById('devicesCount').textContent = connectedDevices;
-                showNotification('👥 انضم جهاز جديد للجلسة', 'info');
-            });
-            
-            socket.on('image-received', (data) => {
-                displayReceivedImage(data.image);
-                showNotification('📸 تم استلام صورة جديدة!', 'success');
-            });
+                await pc.setRemoteDescription(offer);
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                
+                document.getElementById('receiverStatus').className = 'connection-status-box waiting show';
+                document.getElementById('receiverStatus').innerHTML = '⏳ في انتظار إتمام الاتصال...';
+                
+            } catch (error) {
+                showNotification('❌ كود غير صحيح', 'error');
+                console.error(error);
+            }
         }
 
-        // نسخ الكود
-        function copyCode() {
-            const code = document.getElementById('sessionCode').textContent;
-            if (code !== '------') {
-                navigator.clipboard.writeText(code).then(() => {
-                    showNotification('✅ تم نسخ الكود: ' + code, 'success');
-                }).catch(() => {
-                    // طريقة بديلة
-                    const selection = window.getSelection();
-                    const range = document.createRange();
-                    range.selectNodeContents(document.getElementById('sessionCode'));
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+        // الاتصال بالـ Answer (للمرسل)
+        async function connectWithAnswer() {
+            const answerString = document.getElementById('answerInput').value.trim();
+            
+            if (!answerString) {
+                showNotification('⚠️ الرجاء إدخال كود الرد', 'error');
+                return;
+            }
+            
+            try {
+                const answer = JSON.parse(atob(answerString));
+                await pc.setRemoteDescription(answer);
+                
+                showNotification('✅ جاري الاتصال...', 'info');
+                
+            } catch (error) {
+                showNotification('❌ كود الرد غير صحيح', 'error');
+                console.error(error);
+            }
+        }
+
+        // إعداد قناة البيانات
+        function setupDataChannel() {
+            dataChannel.onopen = () => {
+                isConnected = true;
+                showNotification('✅ تم الاتصال بنجاح!', 'success');
+                
+                // تحديث الحالة
+                if (currentMode === 'send') {
+                    document.getElementById('senderStatus').className = 'connection-status-box connected show';
+                    document.getElementById('senderStatus').innerHTML = '✅ متصل بنجاح! يمكنك الآن إرسال الصور';
+                } else {
+                    document.getElementById('receiverStatus').className = 'connection-status-box connected show';
+                    document.getElementById('receiverStatus').innerHTML = '✅ متصل بنجاح! في انتظار الصور...';
+                }
+                
+                // عرض منطقة المحتوى
+                document.getElementById('contentArea').classList.add('show');
+            };
+            
+            dataChannel.onclose = () => {
+                isConnected = false;
+                showNotification('❌ انقطع الاتصال', 'error');
+            };
+            
+            dataChannel.onmessage = (event) => {
+                // استقبال الصورة
+                if (currentMode === 'receive') {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'image') {
+                            displayReceivedImage(data.image);
+                            showNotification('📸 تم استلام صورة جديدة!', 'success');
+                        }
+                    } catch (error) {
+                        console.error('Error receiving image:', error);
+                    }
+                }
+            };
+        }
+
+        // نسخ Offer
+        function copyOffer() {
+            const code = document.getElementById('offerCode').textContent;
+            if (code !== 'جاري إنشاء الكود...') {
+                copyToClipboard(code);
+                showNotification('✅ تم نسخ الكود', 'success');
+            }
+        }
+
+        // نسخ Answer
+        function copyAnswer() {
+            const code = document.getElementById('answerCode').textContent;
+            if (code !== '...') {
+                copyToClipboard(code);
+                showNotification('✅ تم نسخ كود الرد', 'success');
+            }
+        }
+
+        // نسخ للحافظة
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text);
+            } else {
+                // طريقة بديلة للأجهزة القديمة
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
                     document.execCommand('copy');
-                    showNotification('✅ تم نسخ الكود', 'success');
-                });
+                } catch (error) {
+                    console.error('Copy failed:', error);
+                }
+                document.body.removeChild(textArea);
             }
         }
 
@@ -732,14 +772,52 @@
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    currentImage = e.target.result;
-                    document.getElementById('displayImage').src = currentImage;
-                    document.getElementById('displayImage').style.display = 'block';
-                    document.getElementById('uploadArea').style.display = 'none';
-                    showNotification('✅ تم تحميل الصورة', 'success');
+                    // ضغط الصورة
+                    compressImage(e.target.result, (compressedImage) => {
+                        currentImage = compressedImage;
+                        document.getElementById('displayImage').src = compressedImage;
+                        document.getElementById('displayImage').style.display = 'block';
+                        document.getElementById('uploadArea').style.display = 'none';
+                        showNotification('✅ تم تحميل الصورة', 'success');
+                    });
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        // ضغط الصورة
+        function compressImage(dataUrl, callback) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // حساب الحجم الجديد
+                let width = img.width;
+                let height = img.height;
+                const maxSize = 800;
+                
+                if (width > height) {
+                    if (width > maxSize) {
+                        height = (maxSize / width) * height;
+                        width = maxSize;
+                    }
+                } else {
+                    if (height > maxSize) {
+                        width = (maxSize / height) * width;
+                        height = maxSize;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // تحويل لـ JPEG بجودة 60%
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                callback(compressedDataUrl);
+            };
+            img.src = dataUrl;
         }
 
         // عرض الصورة المستلمة
@@ -751,7 +829,7 @@
 
         // إرسال الصورة
         function sendImage() {
-            if (!isConnected || !socket) {
+            if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') {
                 showNotification('⚠️ لا يوجد اتصال', 'error');
                 return;
             }
@@ -761,20 +839,28 @@
                 return;
             }
             
-            socket.emit('send-image', {
-                code: sessionCode,
-                image: currentImage
-            });
-            
-            showNotification('✅ تم إرسال الصورة بنجاح!', 'success');
-        }
-
-        // تحديث حالة الاتصال
-        function updateConnectionStatus() {
-            if (isConnected) {
-                // تحديث الواجهة عند الاتصال
-            } else {
-                // تحديث الواجهة عند انقطاع الاتصال
+            try {
+                const message = JSON.stringify({
+                    type: 'image',
+                    image: currentImage,
+                    timestamp: Date.now()
+                });
+                
+                // تقسيم الرسالة إذا كانت كبيرة
+                const chunkSize = 16384; // 16KB chunks
+                if (message.length > chunkSize) {
+                    for (let i = 0; i < message.length; i += chunkSize) {
+                        dataChannel.send(message.slice(i, i + chunkSize));
+                    }
+                } else {
+                    dataChannel.send(message);
+                }
+                
+                showNotification('✅ تم إرسال الصورة بنجاح!', 'success');
+                
+            } catch (error) {
+                showNotification('❌ خطأ في إرسال الصورة', 'error');
+                console.error('Send error:', error);
             }
         }
 
@@ -807,19 +893,12 @@
             
             const file = e.dataTransfer.files[0];
             if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    currentImage = event.target.result;
-                    document.getElementById('displayImage').src = currentImage;
-                    document.getElementById('displayImage').style.display = 'block';
-                    document.getElementById('uploadArea').style.display = 'none';
-                    showNotification('✅ تم تحميل الصورة', 'success');
-                };
-                reader.readAsDataURL(file);
+                const event = { target: { files: [file] } };
+                handleFileSelect(event);
             }
         });
 
-        // MediaPipe Hands للتعرف على اليد
+        // MediaPipe Hands
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -864,7 +943,7 @@
             return openFingers >= 4 ? 'open' : 'closed';
         }
 
-        // معالجة نتائج التعرف على اليد
+        // معالجة نتائج اليد
         hands.onResults((results) => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -891,7 +970,7 @@
                 if (lastHandState !== handState) {
                     gestureSequence.push(handState);
                     
-                    // التحقق من نمط الإرسال
+                    // نمط الإرسال
                     if (gestureSequence.length >= 4) {
                         const lastFour = gestureSequence.slice(-4);
                         if (lastFour[0] === 'closed' && 
@@ -913,7 +992,7 @@
                 
                 lastHandState = handState;
                 
-                // رسم الخطوط على اليد
+                // رسم الخطوط
                 const connections = [
                     [0, 1], [1, 2], [2, 3], [3, 4],
                     [0, 5], [5, 6], [6, 7], [7, 8],
@@ -962,7 +1041,7 @@
         });
 
         camera.start().catch((err) => {
-            showNotification('⚠️ لا يمكن الوصول للكاميرا', 'error');
+            console.log('Camera error:', err);
         });
     </script>
 </body>
