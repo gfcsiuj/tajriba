@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نقل الصور بإشارة اليد</title>
     <style>
-        /* نفس الستايل السابق */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +27,6 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
-            animation: fadeIn 0.5s ease;
         }
 
         .header h1 {
@@ -44,108 +42,60 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        .room-info {
+        /* قسم اختيار الوضع */
+        .mode-selector {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
         }
 
-        .room-input {
+        .mode-btn {
             flex: 1;
-            padding: 12px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .room-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
+            max-width: 300px;
+            padding: 20px;
+            font-size: 1.3em;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .generate-btn {
-            background: #ffc107;
+            background: white;
             color: #333;
         }
 
-        .generate-btn:hover {
-            background: #ffb300;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        .copy-btn {
-            background: #03a9f4;
-            color: white;
-        }
-
-        .copy-btn:hover {
-            background: #0288d1;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(3, 169, 244, 0.3);
-        }
-
-        .connect-btn {
+        .mode-btn.active {
+            border-color: #667eea;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
 
-        .connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        .mode-btn.send-mode.active {
+            background: linear-gradient(135deg, #00c853, #64dd17);
+            border-color: #00c853;
         }
 
-        .connect-btn.connected {
-            background: linear-gradient(135deg, #4caf50, #45a049);
+        .mode-btn.receive-mode.active {
+            background: linear-gradient(135deg, #2196f3, #03a9f4);
+            border-color: #2196f3;
         }
 
-        .room-display {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 2px dashed #667eea;
-            text-align: center;
+        /* قسم الاتصال */
+        .connection-section {
             display: none;
-        }
-
-        .room-display.show {
-            display: block;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 15px;
+            margin-bottom: 30px;
             animation: slideDown 0.5s ease;
         }
 
-        .room-code-large {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 5px;
-        }
-
-        .share-instruction {
-            color: #666;
-            margin-top: 10px;
+        .connection-section.show {
+            display: block;
         }
 
         @keyframes slideDown {
@@ -159,44 +109,165 @@
             }
         }
 
-        .mode-selector {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            justify-content: center;
+        .send-connection {
+            text-align: center;
         }
 
-        .mode-btn {
+        .code-display {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .code-label {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .code-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 8px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 10px 0;
+            user-select: all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .code-value:hover {
+            background: #e0e0e0;
+            transform: scale(1.02);
+        }
+
+        .copy-btn-large {
             padding: 15px 40px;
             font-size: 1.2em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #f0f0f0;
-            color: #333;
+            margin: 10px;
         }
 
-        .mode-btn.active {
-            transform: scale(1.05);
+        .copy-btn-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
-        .mode-btn.send-mode.active {
-            background: linear-gradient(135deg, #00c853, #64dd17);
+        .receive-connection {
+            text-align: center;
+        }
+
+        .code-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .code-input {
+            padding: 15px 25px;
+            font-size: 1.5em;
+            text-align: center;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            width: 300px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .connect-btn-large {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: linear-gradient(135deg, #4caf50, #45a049);
             color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .mode-btn.receive-mode.active {
-            background: linear-gradient(135deg, #2196f3, #03a9f4);
-            color: white;
+        .connect-btn-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
         }
 
-        /* باقي الستايلات كما هي */
+        .connect-btn-large:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* حالة الاتصال */
+        .connection-status-box {
+            display: none;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
+        }
+
+        .connection-status-box.show {
+            display: block;
+        }
+
+        .connection-status-box.connected {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .connection-status-box.waiting {
+            background: linear-gradient(135deg, #fff3cd, #ffeeba);
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        .connection-status-box.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* منطقة المحتوى */
         .content-area {
-            display: grid;
+            display: none;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-top: 30px;
+        }
+
+        .content-area.show {
+            display: grid;
         }
 
         @media (max-width: 768px) {
@@ -204,11 +275,16 @@
                 grid-template-columns: 1fr;
             }
             
-            .room-info {
+            .mode-selector {
                 flex-direction: column;
             }
             
-            .btn {
+            .code-input-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .code-input {
                 width: 100%;
             }
         }
@@ -217,6 +293,12 @@
             background: #f8f9fa;
             border-radius: 15px;
             padding: 20px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
         }
 
         .video-container {
@@ -281,33 +363,64 @@
             display: none;
         }
 
-        .toast {
+        /* الإشعارات */
+        .notification {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
+            top: 30px;
+            right: 30px;
+            padding: 20px 30px;
+            border-radius: 15px;
             color: white;
-            padding: 15px 30px;
-            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
             display: none;
-            z-index: 1000;
+            animation: slideInRight 0.5s ease;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .toast.show {
+        .notification.show {
             display: block;
-            animation: toastSlideUp 0.5s ease;
         }
 
-        @keyframes toastSlideUp {
+        .notification.success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f44336, #e53935);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+        }
+
+        @keyframes slideInRight {
             from {
+                transform: translateX(100%);
                 opacity: 0;
-                transform: translateX(-50%) translateY(20px);
             }
             to {
+                transform: translateX(0);
                 opacity: 1;
-                transform: translateX(-50%) translateY(0);
             }
+        }
+
+        /* عداد الأجهزة المتصلة */
+        .devices-counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .devices-counter .count {
+            color: #4caf50;
+            font-size: 1.2em;
         }
     </style>
 </head>
@@ -315,46 +428,65 @@
     <div class="container">
         <div class="header">
             <h1>✋ نقل الصور بإشارة اليد 📸</h1>
-            <p>شارك الصور بين الأجهزة بحركة بسيطة</p>
+            <p>انقل الصور بين الأجهزة بحركة يدك</p>
         </div>
 
         <div class="main-panel">
-            <!-- إدخال رمز الغرفة -->
-            <div class="room-info">
-                <label style="font-weight: bold; font-size: 1.1em;">🏠 رمز الغرفة:</label>
-                <input type="text" class="room-input" id="roomCode" placeholder="أدخل رمز مشترك">
-                <button class="btn generate-btn" onclick="generateRoomCode()">
-                    🎲 توليد رمز
-                </button>
-                <button class="btn copy-btn" onclick="copyRoomCode()">
-                    📋 نسخ
-                </button>
-                <button class="btn connect-btn" id="connectBtn" onclick="connectToRoom()">
-                    🔗 اتصال
-                </button>
-            </div>
-
-            <!-- عرض رمز الغرفة بشكل واضح -->
-            <div class="room-display" id="roomDisplay">
-                <p style="color: #666;">رمز الغرفة المتصلة:</p>
-                <div class="room-code-large" id="roomCodeDisplay"></div>
-                <p class="share-instruction">📱 شارك هذا الرمز مع الجهاز الآخر</p>
-            </div>
-
             <!-- اختيار الوضع -->
             <div class="mode-selector">
-                <button class="mode-btn send-mode" onclick="setMode('send')">
-                    📤 وضع الإرسال
-                </button>
-                <button class="mode-btn receive-mode" onclick="setMode('receive')">
-                    📥 وضع الاستقبال
-                </button>
+                <div class="mode-btn send-mode" onclick="setMode('send')">
+                    <div style="font-size: 3em; margin-bottom: 10px;">📤</div>
+                    <div>وضع الإرسال</div>
+                    <small style="opacity: 0.7; font-size: 0.8em;">لإرسال الصور لجهاز آخر</small>
+                </div>
+                <div class="mode-btn receive-mode" onclick="setMode('receive')">
+                    <div style="font-size: 3em; margin-bottom: 10px;">📥</div>
+                    <div>وضع الاستقبال</div>
+                    <small style="opacity: 0.7; font-size: 0.8em;">لاستقبال الصور من جهاز آخر</small>
+                </div>
             </div>
 
-            <!-- باقي المحتوى كما هو -->
-            <div class="content-area">
+            <!-- قسم الاتصال للإرسال -->
+            <div class="connection-section send-connection" id="sendConnection">
+                <h2>🔗 كود الاتصال</h2>
+                <div class="code-display">
+                    <div class="code-label">شارك هذا الكود مع الجهاز المستقبل:</div>
+                    <div class="code-value" id="sessionCode" onclick="copyCode()">------</div>
+                    <button class="copy-btn-large" onclick="copyCode()">
+                        📋 نسخ الكود
+                    </button>
+                </div>
+                <div class="connection-status-box waiting" id="senderStatus">
+                    ⏳ في انتظار اتصال الجهاز المستقبل...
+                </div>
+            </div>
+
+            <!-- قسم الاتصال للاستقبال -->
+            <div class="connection-section receive-connection" id="receiveConnection">
+                <h2>🔗 الاتصال بالمرسل</h2>
+                <div class="code-input-group">
+                    <input type="text" 
+                           class="code-input" 
+                           id="receiverCodeInput" 
+                           placeholder="أدخل الكود"
+                           maxlength="6">
+                    <button class="connect-btn-large" onclick="connectToSender()">
+                        🔗 اتصال
+                    </button>
+                </div>
+                <div class="connection-status-box" id="receiverStatus"></div>
+            </div>
+
+            <!-- منطقة المحتوى الرئيسية -->
+            <div class="content-area" id="contentArea">
+                <!-- عداد الأجهزة -->
+                <div class="devices-counter">
+                    👥 الأجهزة المتصلة: <span class="count" id="devicesCount">0</span>
+                </div>
+
+                <!-- قسم الكاميرا -->
                 <div class="video-section">
-                    <h3>📹 كاميرا التعرف على اليد</h3>
+                    <h3 class="section-title">📹 كاميرا التعرف على اليد</h3>
                     <div class="video-container">
                         <video id="video" autoplay playsinline style="display: none;"></video>
                         <canvas id="canvas"></canvas>
@@ -364,12 +496,14 @@
                     </div>
                 </div>
 
+                <!-- قسم الصورة -->
                 <div class="image-section">
-                    <h3 id="imageSectionTitle">🖼️ منطقة الصورة</h3>
+                    <h3 class="section-title" id="imageSectionTitle">🖼️ منطقة الصورة</h3>
                     <div class="image-preview">
                         <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                             <div style="font-size: 3em;">📁</div>
                             <p>اضغط لتحميل صورة</p>
+                            <p style="font-size: 0.9em; opacity: 0.7;">أو اسحب الصورة هنا</p>
                         </div>
                         <img id="displayImage" style="display: none; width: 100%; height: 100%; object-fit: cover;">
                     </div>
@@ -379,122 +513,220 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <!-- الإشعارات -->
+    <div class="notification" id="notification"></div>
 
     <!-- المكتبات -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        // المتغيرات
+        // المتغيرات الأساسية
         let currentMode = null;
         let socket = null;
-        let roomId = null;
-        let currentImage = null;
+        let sessionCode = null;
         let isConnected = false;
+        let currentImage = null;
         let lastHandState = null;
         let gestureSequence = [];
+        let connectedDevices = 0;
 
-        // توليد رمز عشوائي
-        function generateRoomCode() {
-            const randomCode = 'room-' + Math.random().toString(36).substring(2, 8);
-            document.getElementById('roomCode').value = randomCode;
-            showToast('🎲 تم توليد رمز جديد: ' + randomCode);
-        }
-
-        // نسخ رمز الغرفة
-        function copyRoomCode() {
-            const roomCode = document.getElementById('roomCode').value;
-            if (roomCode) {
-                navigator.clipboard.writeText(roomCode).then(() => {
-                    showToast('📋 تم نسخ الرمز: ' + roomCode);
-                }).catch(() => {
-                    // طريقة بديلة للنسخ
-                    const input = document.getElementById('roomCode');
-                    input.select();
-                    document.execCommand('copy');
-                    showToast('📋 تم نسخ الرمز');
-                });
-            } else {
-                showToast('⚠️ لا يوجد رمز للنسخ');
-            }
-        }
-
-        // الاتصال بالغرفة
-        function connectToRoom() {
-            const roomCode = document.getElementById('roomCode').value.trim();
-            
-            if (!roomCode) {
-                showToast('⚠️ الرجاء إدخال رمز الغرفة');
-                return;
-            }
-            
-            if (!currentMode) {
-                showToast('⚠️ الرجاء اختيار وضع العمل أولاً');
-                return;
-            }
-            
-            roomId = roomCode;
-            
-            // عرض رمز الغرفة
-            document.getElementById('roomCodeDisplay').textContent = roomId;
-            document.getElementById('roomDisplay').classList.add('show');
-            
-            // تحديث زر الاتصال
-            const connectBtn = document.getElementById('connectBtn');
-            connectBtn.classList.add('connected');
-            connectBtn.innerHTML = '✅ متصل';
-            
-            // الاتصال بالخادم المحلي
-            // لاستخدام خادم محلي، استخدم localhost:3000
-            // لاستخدام خادم عام، يمكنك استخدام خدمة مثل Glitch
-            socket = io('http://localhost:3000', {
-                transports: ['websocket', 'polling']
-            });
-            
-            socket.on('connect', () => {
-                socket.emit('join-room', { roomId, mode: currentMode });
-                isConnected = true;
-                showToast('✅ تم الاتصال بالغرفة: ' + roomId);
-            });
-            
-            socket.on('image-received', (data) => {
-                if (currentMode === 'receive') {
-                    displayReceivedImage(data.image);
-                    showToast('📸 تم استلام صورة جديدة');
-                }
-            });
-            
-            socket.on('disconnect', () => {
-                isConnected = false;
-                connectBtn.classList.remove('connected');
-                connectBtn.innerHTML = '🔗 اتصال';
-                showToast('❌ انقطع الاتصال');
-            });
+        // توليد كود جلسة عشوائي
+        function generateSessionCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
         // تحديد الوضع
         function setMode(mode) {
             currentMode = mode;
             
+            // إعادة تعيين الأزرار
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
+            // إخفاء جميع الأقسام
+            document.querySelectorAll('.connection-section').forEach(section => {
+                section.classList.remove('show');
+            });
+            
             if (mode === 'send') {
+                // وضع الإرسال
                 document.querySelector('.send-mode').classList.add('active');
+                document.getElementById('sendConnection').classList.add('show');
                 document.getElementById('uploadArea').style.display = 'block';
-                showToast('📤 وضع الإرسال مفعل');
-            } else {
+                document.getElementById('imageSectionTitle').textContent = '📤 الصورة المراد إرسالها';
+                
+                // توليد كود جديد
+                sessionCode = generateSessionCode();
+                document.getElementById('sessionCode').textContent = sessionCode;
+                
+                // الاتصال بالخادم
+                connectToServer('sender');
+                
+                showNotification('تم توليد كود الجلسة: ' + sessionCode, 'info');
+                
+            } else if (mode === 'receive') {
+                // وضع الاستقبال
                 document.querySelector('.receive-mode').classList.add('active');
+                document.getElementById('receiveConnection').classList.add('show');
                 document.getElementById('uploadArea').style.display = 'none';
-                showToast('📥 وضع الاستقبال مفعل');
+                document.getElementById('imageSectionTitle').textContent = '📥 الصورة المستلمة';
+                
+                showNotification('أدخل كود الجلسة للاتصال', 'info');
             }
         }
 
-        // معالجة اختيار الملف
+        // الاتصال بالخادم
+        function connectToServer(role) {
+            // الاتصال بالخادم المحلي
+            socket = io('http://localhost:3000');
+            
+            socket.on('connect', () => {
+                console.log('متصل بالخادم');
+                
+                if (role === 'sender') {
+                    // إنشاء غرفة جديدة
+                    socket.emit('create-room', { code: sessionCode });
+                }
+            });
+            
+            // استقبال تأكيد إنشاء الغرفة
+            socket.on('room-created', (data) => {
+                console.log('تم إنشاء الغرفة:', data.code);
+                document.getElementById('senderStatus').innerHTML = 
+                    '⏳ في انتظار اتصال الجهاز المستقبل...<br>كود الجلسة: ' + data.code;
+            });
+            
+            // عندما ينضم جهاز للغرفة
+            socket.on('device-joined', (data) => {
+                isConnected = true;
+                connectedDevices = data.deviceCount;
+                updateConnectionStatus();
+                showNotification('✅ تم اتصال جهاز جديد!', 'success');
+                
+                // عرض منطقة المحتوى
+                document.getElementById('contentArea').classList.add('show');
+                document.getElementById('devicesCount').textContent = connectedDevices;
+                
+                if (currentMode === 'send') {
+                    document.getElementById('senderStatus').className = 'connection-status-box connected show';
+                    document.getElementById('senderStatus').innerHTML = 
+                        '✅ متصل بنجاح! يمكنك الآن إرسال الصور';
+                }
+            });
+            
+            // استقبال صورة
+            socket.on('image-received', (data) => {
+                if (currentMode === 'receive') {
+                    displayReceivedImage(data.image);
+                    showNotification('📸 تم استلام صورة جديدة!', 'success');
+                }
+            });
+            
+            // عند انقطاع الاتصال
+            socket.on('device-disconnected', (data) => {
+                connectedDevices = data.deviceCount;
+                document.getElementById('devicesCount').textContent = connectedDevices;
+                showNotification('⚠️ انقطع اتصال أحد الأجهزة', 'error');
+                
+                if (connectedDevices === 0) {
+                    isConnected = false;
+                    updateConnectionStatus();
+                }
+            });
+            
+            socket.on('disconnect', () => {
+                isConnected = false;
+                showNotification('❌ انقطع الاتصال بالخادم', 'error');
+            });
+            
+            // خطأ في الاتصال
+            socket.on('error', (error) => {
+                showNotification('❌ خطأ: ' + error, 'error');
+            });
+        }
+
+        // الاتصال بالمرسل (للمستقبل)
+        function connectToSender() {
+            const code = document.getElementById('receiverCodeInput').value.toUpperCase().trim();
+            
+            if (!code) {
+                showNotification('⚠️ الرجاء إدخال كود الجلسة', 'error');
+                return;
+            }
+            
+            sessionCode = code;
+            
+            // الاتصال بالخادم
+            socket = io('http://localhost:3000');
+            
+            socket.on('connect', () => {
+                // الانضمام للغرفة
+                socket.emit('join-room', { code: sessionCode });
+                
+                document.getElementById('receiverStatus').classList.add('show', 'waiting');
+                document.getElementById('receiverStatus').innerHTML = '⏳ جاري الاتصال...';
+            });
+            
+            // تأكيد الانضمام
+            socket.on('joined-room', (data) => {
+                isConnected = true;
+                connectedDevices = data.deviceCount;
+                
+                document.getElementById('receiverStatus').className = 'connection-status-box connected show';
+                document.getElementById('receiverStatus').innerHTML = 
+                    '✅ متصل بنجاح! في انتظار الصور...';
+                
+                document.getElementById('contentArea').classList.add('show');
+                document.getElementById('devicesCount').textContent = connectedDevices;
+                
+                showNotification('✅ تم الاتصال بنجاح!', 'success');
+            });
+            
+            // خطأ في الكود
+            socket.on('room-not-found', () => {
+                document.getElementById('receiverStatus').className = 'connection-status-box error show';
+                document.getElementById('receiverStatus').innerHTML = 
+                    '❌ كود الجلسة غير صحيح أو منتهي الصلاحية';
+                showNotification('❌ كود الجلسة غير صحيح', 'error');
+            });
+            
+            // نفس معالجات الأحداث السابقة
+            socket.on('device-joined', (data) => {
+                connectedDevices = data.deviceCount;
+                document.getElementById('devicesCount').textContent = connectedDevices;
+                showNotification('👥 انضم جهاز جديد للجلسة', 'info');
+            });
+            
+            socket.on('image-received', (data) => {
+                displayReceivedImage(data.image);
+                showNotification('📸 تم استلام صورة جديدة!', 'success');
+            });
+        }
+
+        // نسخ الكود
+        function copyCode() {
+            const code = document.getElementById('sessionCode').textContent;
+            if (code !== '------') {
+                navigator.clipboard.writeText(code).then(() => {
+                    showNotification('✅ تم نسخ الكود: ' + code, 'success');
+                }).catch(() => {
+                    // طريقة بديلة
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(document.getElementById('sessionCode'));
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    document.execCommand('copy');
+                    showNotification('✅ تم نسخ الكود', 'success');
+                });
+            }
+        }
+
+        // معالجة اختيار الصورة
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -504,7 +736,7 @@
                     document.getElementById('displayImage').src = currentImage;
                     document.getElementById('displayImage').style.display = 'block';
                     document.getElementById('uploadArea').style.display = 'none';
-                    showToast('✅ تم تحميل الصورة');
+                    showNotification('✅ تم تحميل الصورة', 'success');
                 };
                 reader.readAsDataURL(file);
             }
@@ -517,18 +749,77 @@
             document.getElementById('uploadArea').style.display = 'none';
         }
 
-        // إظهار الإشعارات
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
+        // إرسال الصورة
+        function sendImage() {
+            if (!isConnected || !socket) {
+                showNotification('⚠️ لا يوجد اتصال', 'error');
+                return;
+            }
             
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            if (!currentImage) {
+                showNotification('⚠️ الرجاء تحميل صورة أولاً', 'error');
+                return;
+            }
+            
+            socket.emit('send-image', {
+                code: sessionCode,
+                image: currentImage
+            });
+            
+            showNotification('✅ تم إرسال الصورة بنجاح!', 'success');
         }
 
-        // MediaPipe Hands
+        // تحديث حالة الاتصال
+        function updateConnectionStatus() {
+            if (isConnected) {
+                // تحديث الواجهة عند الاتصال
+            } else {
+                // تحديث الواجهة عند انقطاع الاتصال
+            }
+        }
+
+        // عرض الإشعارات
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // إعداد السحب والإفلات
+        const imagePreview = document.querySelector('.image-preview');
+        
+        imagePreview.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imagePreview.style.background = 'rgba(103, 126, 234, 0.1)';
+        });
+        
+        imagePreview.addEventListener('dragleave', () => {
+            imagePreview.style.background = '#e0e0e0';
+        });
+        
+        imagePreview.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imagePreview.style.background = '#e0e0e0';
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentImage = event.target.result;
+                    document.getElementById('displayImage').src = currentImage;
+                    document.getElementById('displayImage').style.display = 'block';
+                    document.getElementById('uploadArea').style.display = 'none';
+                    showNotification('✅ تم تحميل الصورة', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // MediaPipe Hands للتعرف على اليد
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -550,12 +841,14 @@
         function checkHandState(landmarks) {
             const fingers = [];
             
+            // الإبهام
             if (landmarks[4].x < landmarks[3].x) {
                 fingers.push(1);
             } else {
                 fingers.push(0);
             }
             
+            // باقي الأصابع
             const fingerTips = [8, 12, 16, 20];
             const fingerPips = [6, 10, 14, 18];
             
@@ -571,6 +864,7 @@
             return openFingers >= 4 ? 'open' : 'closed';
         }
 
+        // معالجة نتائج التعرف على اليد
         hands.onResults((results) => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -583,6 +877,7 @@
                 const landmarks = results.multiHandLandmarks[0];
                 const handState = checkHandState(landmarks);
                 
+                // تحديث حالة اليد
                 const handStatus = document.getElementById('handStatus');
                 if (handState === 'open') {
                     handStatus.className = 'hand-status open';
@@ -592,10 +887,11 @@
                     handStatus.textContent = '✊ اليد مغلقة';
                 }
                 
-                // تتبع الحركات للإرسال
+                // تتبع الحركات
                 if (lastHandState !== handState) {
                     gestureSequence.push(handState);
                     
+                    // التحقق من نمط الإرسال
                     if (gestureSequence.length >= 4) {
                         const lastFour = gestureSequence.slice(-4);
                         if (lastFour[0] === 'closed' && 
@@ -603,12 +899,8 @@
                             lastFour[2] === 'closed' && 
                             lastFour[3] === 'open') {
                             
-                            if (currentMode === 'send' && currentImage && socket && isConnected) {
-                                socket.emit('send-image', {
-                                    roomId: roomId,
-                                    image: currentImage
-                                });
-                                showToast('✅ تم إرسال الصورة');
+                            if (currentMode === 'send') {
+                                sendImage();
                             }
                             gestureSequence = [];
                         }
@@ -621,7 +913,7 @@
                 
                 lastHandState = handState;
                 
-                // رسم اليد
+                // رسم الخطوط على اليد
                 const connections = [
                     [0, 1], [1, 2], [2, 3], [3, 4],
                     [0, 5], [5, 6], [6, 7], [7, 8],
@@ -641,12 +933,20 @@
                     ctx.stroke();
                 });
 
+                // رسم النقاط
                 landmarks.forEach((landmark) => {
                     ctx.beginPath();
                     ctx.arc(landmark.x * canvas.width, landmark.y * canvas.height, 5, 0, 2 * Math.PI);
                     ctx.fillStyle = handState === 'open' ? '#00FF00' : '#FF0000';
                     ctx.fill();
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
                 });
+            } else {
+                document.getElementById('handStatus').className = 'hand-status waiting';
+                document.getElementById('handStatus').textContent = 'في انتظار اليد...';
+                lastHandState = null;
             }
 
             ctx.restore();
@@ -661,11 +961,8 @@
             height: 480
         });
 
-        camera.start();
-
-        // توليد رمز عند التحميل
-        window.addEventListener('load', () => {
-            generateRoomCode();
+        camera.start().catch((err) => {
+            showNotification('⚠️ لا يمكن الوصول للكاميرا', 'error');
         });
     </script>
 </body>
