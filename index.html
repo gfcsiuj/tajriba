@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نقل الصور بإشارة اليد</title>
     <style>
+        /* نفس الستايل السابق */
         * {
             margin: 0;
             padding: 0;
@@ -36,17 +37,126 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
         .main-panel {
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.5s ease;
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .room-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .room-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .generate-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .generate-btn:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .copy-btn {
+            background: #03a9f4;
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background: #0288d1;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(3, 169, 244, 0.3);
+        }
+
+        .connect-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .connect-btn.connected {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
+        .room-display {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px dashed #667eea;
+            text-align: center;
+            display: none;
+        }
+
+        .room-display.show {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        .room-code-large {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+        }
+
+        .share-instruction {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .mode-selector {
@@ -65,42 +175,23 @@
             transition: all 0.3s ease;
             background: #f0f0f0;
             color: #333;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mode-btn:before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .mode-btn:hover:before {
-            width: 300px;
-            height: 300px;
         }
 
         .mode-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
             transform: scale(1.05);
         }
 
         .mode-btn.send-mode.active {
             background: linear-gradient(135deg, #00c853, #64dd17);
+            color: white;
         }
 
         .mode-btn.receive-mode.active {
             background: linear-gradient(135deg, #2196f3, #03a9f4);
+            color: white;
         }
 
+        /* باقي الستايلات كما هي */
         .content-area {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -112,22 +203,20 @@
             .content-area {
                 grid-template-columns: 1fr;
             }
+            
+            .room-info {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
         }
 
         .video-section, .image-section {
             background: #f8f9fa;
             border-radius: 15px;
             padding: 20px;
-            position: relative;
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .video-container {
@@ -137,13 +226,6 @@
             overflow: hidden;
             background: #000;
             aspect-ratio: 4/3;
-        }
-
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
         }
 
         #canvas {
@@ -161,7 +243,6 @@
             font-weight: bold;
             color: white;
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
             z-index: 10;
         }
 
@@ -188,195 +269,16 @@
             position: relative;
             overflow: hidden;
             border: 3px dashed #999;
-            transition: all 0.3s ease;
-        }
-
-        .image-preview.has-image {
-            border: none;
-        }
-
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
 
         .upload-area {
             text-align: center;
             padding: 40px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-area:hover {
-            background: rgba(103, 126, 234, 0.1);
-        }
-
-        .upload-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
         }
 
         #fileInput {
             display: none;
-        }
-
-        .status-bar {
-            margin-top: 20px;
-            padding: 15px;
-            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .connection-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ffc107;
-            animation: pulse 2s infinite;
-        }
-
-        .status-dot.connected {
-            background: #4caf50;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
-            }
-        }
-
-        .room-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .room-input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-        }
-
-        .room-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .connect-btn {
-            padding: 10px 30px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .gesture-indicator {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-
-        .gesture-indicator.show {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .transfer-animation {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(103, 126, 234, 0.8), transparent);
-            border-radius: 50%;
-            animation: transferPulse 1s ease;
-            z-index: 1000;
-            pointer-events: none;
-        }
-
-        @keyframes transferPulse {
-            0% {
-                width: 50px;
-                height: 50px;
-                opacity: 1;
-            }
-            100% {
-                width: 300px;
-                height: 300px;
-                opacity: 0;
-            }
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         .toast {
@@ -384,17 +286,17 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 15px 30px;
             border-radius: 30px;
             display: none;
-            animation: toastSlideUp 0.5s ease;
             z-index: 1000;
         }
 
         .toast.show {
             display: block;
+            animation: toastSlideUp 0.5s ease;
         }
 
         @keyframes toastSlideUp {
@@ -413,17 +315,30 @@
     <div class="container">
         <div class="header">
             <h1>✋ نقل الصور بإشارة اليد 📸</h1>
-            <p>انقل الصور بين الأجهزة بحركة بسيطة من يدك</p>
+            <p>شارك الصور بين الأجهزة بحركة بسيطة</p>
         </div>
 
         <div class="main-panel">
-            <!-- معلومات الغرفة -->
+            <!-- إدخال رمز الغرفة -->
             <div class="room-info">
-                <label>🏠 رمز الغرفة:</label>
-                <input type="text" class="room-input" id="roomCode" placeholder="أدخل رمز الغرفة المشترك">
-                <button class="connect-btn" id="connectBtn" onclick="connectToRoom()">
-                    <span id="connectBtnText">اتصال</span>
+                <label style="font-weight: bold; font-size: 1.1em;">🏠 رمز الغرفة:</label>
+                <input type="text" class="room-input" id="roomCode" placeholder="أدخل رمز مشترك">
+                <button class="btn generate-btn" onclick="generateRoomCode()">
+                    🎲 توليد رمز
                 </button>
+                <button class="btn copy-btn" onclick="copyRoomCode()">
+                    📋 نسخ
+                </button>
+                <button class="btn connect-btn" id="connectBtn" onclick="connectToRoom()">
+                    🔗 اتصال
+                </button>
+            </div>
+
+            <!-- عرض رمز الغرفة بشكل واضح -->
+            <div class="room-display" id="roomDisplay">
+                <p style="color: #666;">رمز الغرفة المتصلة:</p>
+                <div class="room-code-large" id="roomCodeDisplay"></div>
+                <p class="share-instruction">📱 شارك هذا الرمز مع الجهاز الآخر</p>
             </div>
 
             <!-- اختيار الوضع -->
@@ -436,68 +351,44 @@
                 </button>
             </div>
 
-            <!-- منطقة المحتوى -->
+            <!-- باقي المحتوى كما هو -->
             <div class="content-area">
-                <!-- قسم الكاميرا -->
                 <div class="video-section">
-                    <h3 class="section-title">
-                        <span>📹</span>
-                        <span>كاميرا التعرف على اليد</span>
-                    </h3>
+                    <h3>📹 كاميرا التعرف على اليد</h3>
                     <div class="video-container">
-                        <video id="video" autoplay playsinline></video>
+                        <video id="video" autoplay playsinline style="display: none;"></video>
                         <canvas id="canvas"></canvas>
                         <div class="hand-status waiting" id="handStatus">
                             في انتظار اليد...
                         </div>
-                        <div class="gesture-indicator" id="gestureIndicator">
-                            جاري النقل...
-                        </div>
                     </div>
                 </div>
 
-                <!-- قسم الصورة -->
                 <div class="image-section">
-                    <h3 class="section-title">
-                        <span>🖼️</span>
-                        <span id="imageSectionTitle">منطقة الصورة</span>
-                    </h3>
-                    <div class="image-preview" id="imagePreview">
+                    <h3 id="imageSectionTitle">🖼️ منطقة الصورة</h3>
+                    <div class="image-preview">
                         <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                            <div class="upload-icon">📁</div>
+                            <div style="font-size: 3em;">📁</div>
                             <p>اضغط لتحميل صورة</p>
-                            <p style="font-size: 0.9em; opacity: 0.7;">أو اسحب الصورة هنا</p>
                         </div>
-                        <img id="displayImage" style="display: none;">
+                        <img id="displayImage" style="display: none; width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
-                </div>
-            </div>
-
-            <!-- شريط الحالة -->
-            <div class="status-bar">
-                <div class="connection-status">
-                    <div class="status-dot" id="connectionDot"></div>
-                    <span id="connectionText">غير متصل</span>
-                </div>
-                <div id="modeStatus">
-                    اختر وضع العمل
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast للإشعارات -->
     <div class="toast" id="toast"></div>
 
-    <!-- MediaPipe والمكتبات -->
+    <!-- المكتبات -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
     <script>
-        // المتغيرات الأساسية
+        // المتغيرات
         let currentMode = null;
         let socket = null;
         let roomId = null;
@@ -505,55 +396,33 @@
         let isConnected = false;
         let lastHandState = null;
         let gestureSequence = [];
-        let isTransferring = false;
 
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const handStatus = document.getElementById('handStatus');
-        const imagePreview = document.getElementById('imagePreview');
-        const displayImage = document.getElementById('displayImage');
-        const uploadArea = document.getElementById('uploadArea');
+        // توليد رمز عشوائي
+        function generateRoomCode() {
+            const randomCode = 'room-' + Math.random().toString(36).substring(2, 8);
+            document.getElementById('roomCode').value = randomCode;
+            showToast('🎲 تم توليد رمز جديد: ' + randomCode);
+        }
 
-        // إعداد MediaPipe Hands
-        const hands = new Hands({
-            locateFile: (file) => {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-            }
-        });
-
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-
-        // دالة تحديد الوضع
-        function setMode(mode) {
-            currentMode = mode;
-            
-            // تحديث الأزرار
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            if (mode === 'send') {
-                document.querySelector('.send-mode').classList.add('active');
-                document.getElementById('modeStatus').textContent = '📤 وضع الإرسال - قم بتحميل صورة';
-                document.getElementById('imageSectionTitle').textContent = 'الصورة المراد إرسالها';
-                uploadArea.style.display = 'block';
-                showToast('وضع الإرسال مفعل - قم بتحميل صورة');
+        // نسخ رمز الغرفة
+        function copyRoomCode() {
+            const roomCode = document.getElementById('roomCode').value;
+            if (roomCode) {
+                navigator.clipboard.writeText(roomCode).then(() => {
+                    showToast('📋 تم نسخ الرمز: ' + roomCode);
+                }).catch(() => {
+                    // طريقة بديلة للنسخ
+                    const input = document.getElementById('roomCode');
+                    input.select();
+                    document.execCommand('copy');
+                    showToast('📋 تم نسخ الرمز');
+                });
             } else {
-                document.querySelector('.receive-mode').classList.add('active');
-                document.getElementById('modeStatus').textContent = '📥 وضع الاستقبال - في انتظار الصور';
-                document.getElementById('imageSectionTitle').textContent = 'الصورة المستلمة';
-                uploadArea.style.display = 'none';
-                showToast('وضع الاستقبال مفعل - في انتظار الصور');
+                showToast('⚠️ لا يوجد رمز للنسخ');
             }
         }
 
-        // دالة الاتصال بالغرفة
+        // الاتصال بالغرفة
         function connectToRoom() {
             const roomCode = document.getElementById('roomCode').value.trim();
             
@@ -569,59 +438,73 @@
             
             roomId = roomCode;
             
-            // الاتصال بالخادم
-            socket = io('https://hand-transfer-server.glitch.me', {
+            // عرض رمز الغرفة
+            document.getElementById('roomCodeDisplay').textContent = roomId;
+            document.getElementById('roomDisplay').classList.add('show');
+            
+            // تحديث زر الاتصال
+            const connectBtn = document.getElementById('connectBtn');
+            connectBtn.classList.add('connected');
+            connectBtn.innerHTML = '✅ متصل';
+            
+            // الاتصال بالخادم المحلي
+            // لاستخدام خادم محلي، استخدم localhost:3000
+            // لاستخدام خادم عام، يمكنك استخدام خدمة مثل Glitch
+            socket = io('http://localhost:3000', {
                 transports: ['websocket', 'polling']
             });
             
             socket.on('connect', () => {
                 socket.emit('join-room', { roomId, mode: currentMode });
                 isConnected = true;
-                updateConnectionStatus(true);
-                showToast('✅ تم الاتصال بنجاح');
+                showToast('✅ تم الاتصال بالغرفة: ' + roomId);
             });
             
             socket.on('image-received', (data) => {
                 if (currentMode === 'receive') {
                     displayReceivedImage(data.image);
-                    showTransferAnimation();
                     showToast('📸 تم استلام صورة جديدة');
                 }
             });
             
             socket.on('disconnect', () => {
                 isConnected = false;
-                updateConnectionStatus(false);
+                connectBtn.classList.remove('connected');
+                connectBtn.innerHTML = '🔗 اتصال';
                 showToast('❌ انقطع الاتصال');
             });
         }
 
-        // تحديث حالة الاتصال
-        function updateConnectionStatus(connected) {
-            const dot = document.getElementById('connectionDot');
-            const text = document.getElementById('connectionText');
+        // تحديد الوضع
+        function setMode(mode) {
+            currentMode = mode;
             
-            if (connected) {
-                dot.classList.add('connected');
-                text.textContent = 'متصل بالغرفة: ' + roomId;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (mode === 'send') {
+                document.querySelector('.send-mode').classList.add('active');
+                document.getElementById('uploadArea').style.display = 'block';
+                showToast('📤 وضع الإرسال مفعل');
             } else {
-                dot.classList.remove('connected');
-                text.textContent = 'غير متصل';
+                document.querySelector('.receive-mode').classList.add('active');
+                document.getElementById('uploadArea').style.display = 'none';
+                showToast('📥 وضع الاستقبال مفعل');
             }
         }
 
-        // التعامل مع اختيار الملف
+        // معالجة اختيار الملف
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     currentImage = e.target.result;
-                    displayImage.src = currentImage;
-                    displayImage.style.display = 'block';
-                    uploadArea.style.display = 'none';
-                    imagePreview.classList.add('has-image');
-                    showToast('✅ تم تحميل الصورة بنجاح');
+                    document.getElementById('displayImage').src = currentImage;
+                    document.getElementById('displayImage').style.display = 'block';
+                    document.getElementById('uploadArea').style.display = 'none';
+                    showToast('✅ تم تحميل الصورة');
                 };
                 reader.readAsDataURL(file);
             }
@@ -629,24 +512,50 @@
 
         // عرض الصورة المستلمة
         function displayReceivedImage(imageData) {
-            displayImage.src = imageData;
-            displayImage.style.display = 'block';
-            uploadArea.style.display = 'none';
-            imagePreview.classList.add('has-image');
+            document.getElementById('displayImage').src = imageData;
+            document.getElementById('displayImage').style.display = 'block';
+            document.getElementById('uploadArea').style.display = 'none';
         }
+
+        // إظهار الإشعارات
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // MediaPipe Hands
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const hands = new Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
 
         // التحقق من حالة اليد
         function checkHandState(landmarks) {
             const fingers = [];
             
-            // الإبهام
             if (landmarks[4].x < landmarks[3].x) {
                 fingers.push(1);
             } else {
                 fingers.push(0);
             }
             
-            // باقي الأصابع
             const fingerTips = [8, 12, 16, 20];
             const fingerPips = [6, 10, 14, 18];
             
@@ -662,7 +571,6 @@
             return openFingers >= 4 ? 'open' : 'closed';
         }
 
-        // معالجة النتائج من MediaPipe
         hands.onResults((results) => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -675,7 +583,7 @@
                 const landmarks = results.multiHandLandmarks[0];
                 const handState = checkHandState(landmarks);
                 
-                // تحديث حالة اليد
+                const handStatus = document.getElementById('handStatus');
                 if (handState === 'open') {
                     handStatus.className = 'hand-status open';
                     handStatus.textContent = '✋ اليد مفتوحة';
@@ -684,11 +592,10 @@
                     handStatus.textContent = '✊ اليد مغلقة';
                 }
                 
-                // تتبع تسلسل الحركات
+                // تتبع الحركات للإرسال
                 if (lastHandState !== handState) {
                     gestureSequence.push(handState);
                     
-                    // إذا كان التسلسل: مغلق -> مفتوح -> مغلق -> مفتوح
                     if (gestureSequence.length >= 4) {
                         const lastFour = gestureSequence.slice(-4);
                         if (lastFour[0] === 'closed' && 
@@ -696,14 +603,17 @@
                             lastFour[2] === 'closed' && 
                             lastFour[3] === 'open') {
                             
-                            if (currentMode === 'send' && currentImage && !isTransferring) {
-                                sendImage();
+                            if (currentMode === 'send' && currentImage && socket && isConnected) {
+                                socket.emit('send-image', {
+                                    roomId: roomId,
+                                    image: currentImage
+                                });
+                                showToast('✅ تم إرسال الصورة');
                             }
                             gestureSequence = [];
                         }
                     }
                     
-                    // الاحتفاظ بآخر 10 حركات فقط
                     if (gestureSequence.length > 10) {
                         gestureSequence.shift();
                     }
@@ -711,138 +621,35 @@
                 
                 lastHandState = handState;
                 
-                // رسم نقاط وخطوط اليد
-                drawHandLandmarks(landmarks, handState === 'open' ? '#00FF00' : '#FF0000');
-            } else {
-                handStatus.className = 'hand-status waiting';
-                handStatus.textContent = 'في انتظار اليد...';
-                lastHandState = null;
+                // رسم اليد
+                const connections = [
+                    [0, 1], [1, 2], [2, 3], [3, 4],
+                    [0, 5], [5, 6], [6, 7], [7, 8],
+                    [0, 9], [9, 10], [10, 11], [11, 12],
+                    [0, 13], [13, 14], [14, 15], [15, 16],
+                    [0, 17], [17, 18], [18, 19], [19, 20],
+                    [5, 9], [9, 13], [13, 17]
+                ];
+
+                ctx.strokeStyle = handState === 'open' ? '#00FF00' : '#FF0000';
+                ctx.lineWidth = 3;
+                
+                connections.forEach(([start, end]) => {
+                    ctx.beginPath();
+                    ctx.moveTo(landmarks[start].x * canvas.width, landmarks[start].y * canvas.height);
+                    ctx.lineTo(landmarks[end].x * canvas.width, landmarks[end].y * canvas.height);
+                    ctx.stroke();
+                });
+
+                landmarks.forEach((landmark) => {
+                    ctx.beginPath();
+                    ctx.arc(landmark.x * canvas.width, landmark.y * canvas.height, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = handState === 'open' ? '#00FF00' : '#FF0000';
+                    ctx.fill();
+                });
             }
 
             ctx.restore();
-        });
-
-        // رسم نقاط اليد
-        function drawHandLandmarks(landmarks, color) {
-            const connections = [
-                [0, 1], [1, 2], [2, 3], [3, 4],
-                [0, 5], [5, 6], [6, 7], [7, 8],
-                [0, 9], [9, 10], [10, 11], [11, 12],
-                [0, 13], [13, 14], [14, 15], [15, 16],
-                [0, 17], [17, 18], [18, 19], [19, 20],
-                [5, 9], [9, 13], [13, 17]
-            ];
-
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-            
-            connections.forEach(([start, end]) => {
-                ctx.beginPath();
-                ctx.moveTo(landmarks[start].x * canvas.width, landmarks[start].y * canvas.height);
-                ctx.lineTo(landmarks[end].x * canvas.width, landmarks[end].y * canvas.height);
-                ctx.stroke();
-            });
-
-            landmarks.forEach((landmark) => {
-                ctx.beginPath();
-                ctx.arc(landmark.x * canvas.width, landmark.y * canvas.height, 5, 0, 2 * Math.PI);
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            });
-        }
-
-        // إرسال الصورة
-        function sendImage() {
-            if (!isConnected || !socket) {
-                showToast('⚠️ الرجاء الاتصال بغرفة أولاً');
-                return;
-            }
-            
-            if (!currentImage) {
-                showToast('⚠️ الرجاء تحميل صورة أولاً');
-                return;
-            }
-            
-            isTransferring = true;
-            showGestureIndicator('جاري الإرسال...');
-            showTransferAnimation();
-            
-            socket.emit('send-image', {
-                roomId: roomId,
-                image: currentImage
-            });
-            
-            showToast('✅ تم إرسال الصورة بنجاح');
-            
-            setTimeout(() => {
-                isTransferring = false;
-                hideGestureIndicator();
-            }, 2000);
-        }
-
-        // عرض مؤشر الحركة
-        function showGestureIndicator(text) {
-            const indicator = document.getElementById('gestureIndicator');
-            indicator.textContent = text;
-            indicator.classList.add('show');
-        }
-
-        function hideGestureIndicator() {
-            document.getElementById('gestureIndicator').classList.remove('show');
-        }
-
-        // عرض حركة النقل
-        function showTransferAnimation() {
-            const animation = document.createElement('div');
-            animation.className = 'transfer-animation';
-            document.body.appendChild(animation);
-            
-            setTimeout(() => {
-                animation.remove();
-            }, 1000);
-        }
-
-        // عرض الإشعارات
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // إعداد السحب والإفلات
-        imagePreview.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            imagePreview.style.background = 'rgba(103, 126, 234, 0.1)';
-        });
-
-        imagePreview.addEventListener('dragleave', () => {
-            imagePreview.style.background = '#f8f9fa';
-        });
-
-        imagePreview.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imagePreview.style.background = '#f8f9fa';
-            
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    currentImage = event.target.result;
-                    displayImage.src = currentImage;
-                    displayImage.style.display = 'block';
-                    uploadArea.style.display = 'none';
-                    imagePreview.classList.add('has-image');
-                    showToast('✅ تم تحميل الصورة بنجاح');
-                };
-                reader.readAsDataURL(file);
-            }
         });
 
         // بدء الكاميرا
@@ -854,8 +661,11 @@
             height: 480
         });
 
-        camera.start().catch((err) => {
-            showToast('❌ خطأ في الوصول للكاميرا: ' + err.message);
+        camera.start();
+
+        // توليد رمز عند التحميل
+        window.addEventListener('load', () => {
+            generateRoomCode();
         });
     </script>
 </body>
