@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    display: flex; /* Use flexbox for layout */
+}
+
+#drawingCanvas {
+    background-color: #ffffff;
+    cursor: crosshair;
+    display: block;
+}
+
+.toolbar {
+    width: 200px; /* Set a fixed width for the toolbar */
+    background-color: #333;
+    padding: 15px;
+    display: flex;
+    flex-direction: column; /* Stack tools vertically */
+    align-items: stretch; /* Stretch items to fill the width */
+    gap: 15px;
+    color: white;
+    height: 100vh; /* Make toolbar full height */
+    box-sizing: border-box; /* Include padding in height/width */
+}
+
+.toolbar label, .toolbar input, .toolbar button {
+    font-family: sans-serif;
+    width: 100%; /* Make elements take full width of toolbar */
+    box-sizing: border-box;
+}
+
+.toolbar button {
+    padding: 10px;
+    border: 1px solid #555;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+}
+
+.toolbar button.active {
+    background-color: #666;
+    border-color: #888;
+}
+
+.toolbar input[type="range"] {
+    width: calc(100% - 20px);
+    margin: 0 10px;
+}
